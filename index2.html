@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriHealth Pro | Complete Nutrition Assessment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c7da0;
+            --secondary: #a5d8dd;
+            --accent: #e63946;
+            --light: #f1faee;
+            --dark: #1d3557;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #fff, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 10px;
+        }
+        
+        .section-title {
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            margin: 20px 0;
+            color: var(--dark);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark);
+        }
+        
+        .calculation-box {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background-color: #e6f2ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+        
+        .client-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .client-item {
+            border-left: 3px solid var(--primary);
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+        }
+        
+        .nutrient-table {
+            font-size: 0.9rem;
+        }
+        
+        .food-table th {
+            background-color: var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-form {
+                padding: 15px;
+            }
+        }
+        
+        .key-feature {
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background-color: white;
+            height: 100%;
+        }
+        
+        .key-feature i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark);
+        }
+        
+        .biochemical-test {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat"></i>
+                <span class="logo-text">NutriHealth Pro</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#clientManager"><i class="fas fa-users"></i> Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calculations"><i class="fas fa-calculator"></i> Calculators</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dietPlanning"><i class="fas fa-utensils"></i> Diet Planning</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Client Information Section -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-user-circle"></i> Client Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="clientForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="clientName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Gender *</label>
+                                        <select class="form-select" id="clientGender" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Age (years) *</label>
+                                        <input type="number" class="form-control" id="clientAge" min="1" max="120" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Height *</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="clientHeight" required>
+                                            <select class="form-select" id="heightUnit">
+                                                <option value="cm">cm</option>
+                                                <option value="m">m</option>
+                                                <option value="inches">inches</option>
+                                                <option value="feet">feet</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Weight *</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="clientWeight" required>
+                                            <select class="form-select" id="weightUnit">
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                                <option value="lbs">lbs</option>
+                                                <option value="oz">oz</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Activity Level *</label>
+                                        <select class="form-select" id="activityLevel" required>
+                                            <option value="1.2">Sedentary (little or no exercise)</option>
+                                            <option value="1.375">Lightly active (light exercise 1-3 days/week)</option>
+                                            <option value="1.55">Moderately active (moderate exercise 3-5 days/week)</option>
+                                            <option value="1.725">Very active (hard exercise 6-7 days/week)</option>
+                                            <option value="1.9">Extra active (very hard exercise, physical job)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Biochemical Tests -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h5 class="section-title">Biochemical Tests</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="biochemical-test">
+                                                <label class="form-label">Blood Glucose (mg/dL)</label>
+                                                <input type="number" class="form-control" id="bloodGlucose">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="biochemical-test">
+                                                <label class="form-label">Cholesterol (mg/dL)</label>
+                                                <input type="number" class="form-control" id="cholesterol">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="biochemical-test">
+                                                <label class="form-label">Hemoglobin (g/dL)</label>
+                                                <input type="number" class="form-control" id="hemoglobin">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Save Client Data</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculations Section -->
+        <div class="row mt-4" id="calculations">
+            <div class="col-lg-12">
+                <h3 class="section-title">Health Calculations</h3>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-weight"></i> Ideal Body Weight (IBW) & BMI</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="calculation-box">
+                            <button class="btn btn-outline-primary" id="calculateIBW">Calculate IBW</button>
+                            <button class="btn btn-outline-primary" id="calculateBMI">Calculate BMI</button>
+                        </div>
+                        <div class="result-box" id="ibwResult">
+                            IBW result will appear here
+                        </div>
+                        <div class="result-box" id="bmiResult">
+                            BMI result will appear here
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-fire"></i> Energy Requirements</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="calculation-box">
+                            <button class="btn btn-outline-primary" id="calculateBEE">Calculate BEE</button>
+                            <button class="btn btn-outline-primary" id="calculateTEE">Calculate TEE</button>
+                        </div>
+                        <div class="result-box" id="beeResult">
+                            BEE result will appear here
+                        </div>
+                        <div class="result-box" id="teeResult">
+                            TEE result will appear here
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> AMDR Calculation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="calculation-box">
+                            <button class="btn btn-outline-primary" id="calculateAMDR">Calculate AMDR</button>
+                        </div>
+                        <div class="result-box" id="amdrResult">
+                            AMDR result will appear here
+                        </div>
+                        <canvas id="amdrChart" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-file-medical"></i> Clinical Assessment</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Clinical Signs & Symptoms</label>
+                            <select class="form-select" id="clinicalSigns" multiple>
+                                <option value="fatigue">Fatigue</option>
+                                <option value="weight_loss">Unexplained Weight Loss</option>
+                                <option value="weight_gain">Unexplained Weight Gain</option>
+                                <option value="hair_loss">Hair Loss</option>
+                                <option value="brittle_nails">Brittle Nails</option>
+                                <option value="pale_skin">Pale Skin</option>
+                                <option value="swelling">Swelling/Edema</option>
+                            </select>
+                            <div class="form-text">Hold Ctrl to select multiple options</div>
+                        </div>
+                        <button class="btn btn-outline-primary" id="analyzeClinical">Analyze Clinical Signs</button>
+                        <div class="result-box mt-3" id="clinicalResult">
+                            Clinical analysis will appear here
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Manager Section -->
+        <div class="row mt-4" id="clientManager">
+            <div class="col-lg-12">
+                <h3 class="section-title">Client Management</h3>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-database"></i> Saved Clients</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search clients..." id="searchClient">
+                            <button class="btn btn-outline-secondary" type="button" id="searchClientBtn"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="client-list" id="clientList">
+                            <!-- Client items will be dynamically added here -->
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                            <button class="btn btn-primary me-md-2" id="generateReport"><i class="fas fa-file-pdf"></i> Generate PDF Report</button>
+                            <button class="btn btn-success" id="exportData"><i class="fas fa-file-export"></i> Export Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diet Planning Section -->
+        <div class="row mt-4" id="dietPlanning">
+            <div class="col-lg-12">
+                <h3 class="section-title">Diet Planning</h3>
+                
+                <ul class="nav nav-tabs" id="dietTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="meal-plan-tab" data-bs-toggle="tab" data-bs-target="#meal-plan" type="button" role="tab">Meal Planning</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="food-db-tab" data-bs-toggle="tab" data-bs-target="#food-db" type="button" role="tab">Food Database</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="recipe-tab" data-bs-toggle="tab" data-bs-target="#recipe" type="button" role="tab">Recipe Library</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="dietTabContent">
+                    <div class="tab-pane fade show active" id="meal-plan" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Diet Type</label>
+                                    <select class="form-select" id="dietType">
+                                        <option value="balanced">Balanced Diet</option>
+                                        <option value="lowCalorie">Low Calorie</option>
+                                        <option value="highCalorie">High Calorie</option>
+                                        <option value="keto">Keto</option>
+                                        <option value="vegetarian">Vegetarian</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Calorie Target</label>
+                                    <input type="number" class="form-control" id="calorieTarget" value="2000">
+                                </div>
+                                <button class="btn btn-primary" id="generateMealPlan">Generate Meal Plan</button>
+                                
+                                <div class="mt-4" id="mealPlanResult">
+                                    <h6>Sample Meal Plan</h6>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Breakfast: Oatmeal with berries and nuts (350 kcal)</li>
+                                        <li class="list-group-item">Lunch: Grilled chicken salad (450 kcal)</li>
+                                        <li class="list-group-item">Snack: Greek yogurt with honey (200 kcal)</li>
+                                        <li class="list-group-item">Dinner: Salmon with quinoa and vegetables (600 kcal)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Weekly Diet Plan Template</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Day</th>
+                                                        <th>Breakfast</th>
+                                                        <th>Lunch</th>
+                                                        <th>Dinner</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Monday</td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Breakfast"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Lunch"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Dinner"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tuesday</td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Breakfast"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Lunch"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Dinner"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Wednesday</td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Breakfast"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Lunch"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" placeholder="Dinner"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <button class="btn btn-sm btn-success mt-2"><i class="fas fa-save"></i> Save Weekly Plan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="food-db" role="tabpanel">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search food items..." id="searchFood">
+                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm food-table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Food Item</th>
+                                        <th>Calories</th>
+                                        <th>Protein (g)</th>
+                                        <th>Carbs (g)</th>
+                                        <th>Fat (g)</th>
+                                        <th>Fiber (g)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="foodTableBody">
+                                    <tr>
+                                        <td>Chicken Breast (100g)</td>
+                                        <td>165</td>
+                                        <td>31</td>
+                                        <td>0</td>
+                                        <td>3.6</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Brown Rice (100g cooked)</td>
+                                        <td>111</td>
+                                        <td>2.6</td>
+                                        <td>23</td>
+                                        <td>0.9</td>
+                                        <td>1.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Broccoli (100g)</td>
+                                        <td>34</td>
+                                        <td>2.8</td>
+                                        <td>7</td>
+                                        <td>0.4</td>
+                                        <td>2.6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Avocado (100g)</td>
+                                        <td>160</td>
+                                        <td>2</td>
+                                        <td>9</td>
+                                        <td>15</td>
+                                        <td>7</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Salmon (100g)</td>
+                                        <td>208</td>
+                                        <td>20</td>
+                                        <td>0</td>
+                                        <td>13</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Eggs (1 large)</td>
+                                        <td>78</td>
+                                        <td>6</td>
+                                        <td>0.6</td>
+                                        <td>5</td>
+                                        <td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="recipe" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Quinoa Salad</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Vegetarian | High Protein</h6>
+                                        <p class="card-text">Ingredients: Quinoa, cucumber, tomatoes, feta cheese, olive oil, lemon juice</p>
+                                        <p class="card-text"><strong>Nutrition: 350 kcal, 15g protein, 40g carbs, 15g fat</strong></p>
+                                        <a href="#" class="btn btn-sm btn-primary">View Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Grilled Chicken</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">High Protein | Low Carb</h6>
+                                        <p class="card-text">Ingredients: Chicken breast, olive oil, herbs, lemon, garlic</p>
+                                        <p class="card-text"><strong>Nutrition: 250 kcal, 30g protein, 2g carbs, 12g fat</strong></p>
+                                        <a href="#" class="btn btn-sm btn-primary">View Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Berry Smoothie</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Vegan | Antioxidants</h6>
+                                        <p class="card-text">Ingredients: Mixed berries, banana, almond milk, chia seeds</p>
+                                        <p class="card-text"><strong>Nutrition: 280 kcal, 8g protein, 45g carbs, 8g fat</strong></p>
+                                        <a href="#" class="btn btn-sm btn-primary">View Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features Section -->
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">Key Features</h3>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="key-feature">
+                    <i class="fas fa-weight-scale"></i>
+                    <h5>Body Composition</h5>
+                    <p>Calculate IBW, BMI, and other metrics</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="key-feature">
+                    <i class="fas fa-calculator"></i>
+                    <h5>Advanced Calculations</h5>
+                    <p>BEE, TEE, and AMDR calculations</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="key-feature">
+                    <i class="fas fa-utensils"></i>
+                    <h5>Meal Planning</h5>
+                    <p>Customized diet plans based on goals</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="key-feature">
+                    <i class="fas fa-file-pdf"></i>
+                    <h5>Reporting</h5>
+                    <p>Generate comprehensive PDF reports</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>NutriHealth Pro</h5>
+                    <p>Comprehensive nutrition assessment and planning platform for health professionals.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2023 NutriHealth Pro. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Main application object
+        const NutriHealthApp = {
+            clients: [],
+            currentClientId: null,
+            
+            init: function() {
+                this.loadClients();
+                this.setupEventListeners();
+                this.setupAMDRChart();
+                this.renderClientList();
+            },
+            
+            loadClients: function() {
+                const savedClients = localStorage.getItem('nutriHealthClients');
+                if (savedClients) {
+                    this.clients = JSON.parse(savedClients);
+                }
+            },
+            
+            saveClients: function() {
+                localStorage.setItem('nutriHealthClients', JSON.stringify(this.clients));
+            },
+            
+            setupEventListeners: function() {
+                // Form submission
+                document.getElementById('clientForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveClientData();
+                });
+                
+                // Calculation buttons
+                document.getElementById('calculateIBW').addEventListener('click', () => this.calculateIBW());
+                document.getElementById('calculateBMI').addEventListener('click', () => this.calculateBMI());
+                document.getElementById('calculateBEE').addEventListener('click', () => this.calculateBEE());
+                document.getElementById('calculateTEE').addEventListener('click', () => this.calculateTEE());
+                document.getElementById('calculateAMDR').addEventListener('click', () => this.calculateAMDR());
+                document.getElementById('generateMealPlan').addEventListener('click', () => this.generateMealPlan());
+                document.getElementById('analyzeClinical').addEventListener('click', () => this.analyzeClinicalSigns());
+                document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
+                document.getElementById('exportData').addEventListener('click', () => this.exportData());
+                document.getElementById('searchClientBtn').addEventListener('click', () => this.searchClients());
+            },
+            
+            saveClientData: function() {
+                const clientData = {
+                    id: this.currentClientId || Date.now(),
+                    name: document.getElementById('clientName').value,
+                    gender: document.getElementById('clientGender').value,
+                    age: parseInt(document.getElementById('clientAge').value),
+                    height: parseFloat(document.getElementById('clientHeight').value),
+                    heightUnit: document.getElementById('heightUnit').value,
+                    weight: parseFloat(document.getElementById('clientWeight').value),
+                    weightUnit: document.getElementById('weightUnit').value,
+                    activityLevel: parseFloat(document.getElementById('activityLevel').value),
+                    bloodGlucose: document.getElementById('bloodGlucose').value ? parseFloat(document.getElementById('bloodGlucose').value) : null,
+                    cholesterol: document.getElementById('cholesterol').value ? parseFloat(document.getElementById('cholesterol').value) : null,
+                    hemoglobin: document.getElementById('hemoglobin').value ? parseFloat(document.getElementById('hemoglobin').value) : null,
+                    clinicalSigns: Array.from(document.getElementById('clinicalSigns').selectedOptions).map(opt => opt.value),
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (this.currentClientId) {
+                    // Update existing client
+                    const index = this.clients.findIndex(c => c.id === this.currentClientId);
+                    if (index !== -1) {
+                        this.clients[index] = clientData;
+                    }
+                } else {
+                    // Add new client
+                    this.clients.push(clientData);
+                }
+                
+                this.saveClients();
+                this.renderClientList();
+                this.currentClientId = null;
+                
+                alert('Client data saved successfully!');
+                document.getElementById('clientForm').reset();
+            },
+            
+            renderClientList: function() {
+                const clientList = document.getElementById('clientList');
+                clientList.innerHTML = '';
+                
+                if (this.clients.length === 0) {
+                    clientList.innerHTML = '<p class="text-center">No client records found.</p>';
+                    return;
+                }
+                
+                this.clients.forEach(client => {
+                    const clientItem = document.createElement('div');
+                    clientItem.className = 'client-item';
+                    clientItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6>${client.name}</h6>
+                                <p class="mb-0">${client.gender}, ${client.age} years, ${client.height} ${client.heightUnit}, ${client.weight} ${client.weightUnit}</p>
+                                <small>Last updated: ${new Date(client.timestamp).toLocaleDateString()}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary" data-id="${client.id}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-id="${client.id}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add event listeners to buttons
+                    const editBtn = clientItem.querySelector('.btn-outline-primary');
+                    const deleteBtn = clientItem.querySelector('.btn-outline-danger');
+                    
+                    editBtn.addEventListener('click', () => this.editClient(client.id));
+                    deleteBtn.addEventListener('click', () => this.deleteClient(client.id));
+                    
+                    clientList.appendChild(clientItem);
+                });
+            },
+            
+            editClient: function(id) {
+                const client = this.clients.find(c => c.id === id);
+                if (client) {
+                    this.currentClientId = client.id;
+                    
+                    // Fill form with client data
+                    document.getElementById('clientName').value = client.name;
+                    document.getElementById('clientGender').value = client.gender;
+                    document.getElementById('clientAge').value = client.age;
+                    document.getElementById('clientHeight').value = client.height;
+                    document.getElementById('heightUnit').value = client.heightUnit;
+                    document.getElementById('clientWeight').value = client.weight;
+                    document.getElementById('weightUnit').value = client.weightUnit;
+                    document.getElementById('activityLevel').value = client.activityLevel;
+                    
+                    if (client.bloodGlucose) document.getElementById('bloodGlucose').value = client.bloodGlucose;
+                    if (client.cholesterol) document.getElementById('cholesterol').value = client.cholesterol;
+                    if (client.hemoglobin) document.getElementById('hemoglobin').value = client.hemoglobin;
+                    
+                    // Scroll to form
+                    document.getElementById('clientForm').scrollIntoView();
+                    
+                    alert('Client data loaded. You can now edit and save changes.');
+                }
+            },
+            
+            deleteClient: function(id) {
+                if (confirm('Are you sure you want to delete this client?')) {
+                    this.clients = this.clients.filter(c => c.id !== id);
+                    this.saveClients();
+                    this.renderClientList();
+                    alert('Client deleted successfully.');
+                }
+            },
+            
+            searchClients: function() {
+                const searchTerm = document.getElementById('searchClient').value.toLowerCase();
+                if (!searchTerm) {
+                    this.renderClientList();
+                    return;
+                }
+                
+                const filteredClients = this.clients.filter(client => 
+                    client.name.toLowerCase().includes(searchTerm) ||
+                    client.gender.toLowerCase().includes(searchTerm) ||
+                    client.age.toString().includes(searchTerm)
+                );
+                
+                const clientList = document.getElementById('clientList');
+                clientList.innerHTML = '';
+                
+                if (filteredClients.length === 0) {
+                    clientList.innerHTML = '<p class="text-center">No matching clients found.</p>';
+                    return;
+                }
+                
+                filteredClients.forEach(client => {
+                    const clientItem = document.createElement('div');
+                    clientItem.className = 'client-item';
+                    clientItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6>${client.name}</h6>
+                                <p class="mb-0">${client.gender}, ${client.age} years, ${client.height} ${client.heightUnit}, ${client.weight} ${client.weightUnit}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary" data-id="${client.id}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-id="${client.id}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add event listeners to buttons
+                    const editBtn = clientItem.querySelector('.btn-outline-primary');
+                    const deleteBtn = clientItem.querySelector('.btn-outline-danger');
+                    
+                    editBtn.addEventListener('click', () => this.editClient(client.id));
+                    deleteBtn.addEventListener('click', () => this.deleteClient(client.id));
+                    
+                    clientList.appendChild(clientItem);
+                });
+            },
+            
+            convertHeightToCm: function(height, unit) {
+                switch(unit) {
+                    case 'cm': return height;
+                    case 'm': return height * 100;
+                    case 'inches': return height * 2.54;
+                    case 'feet': return height * 30.48;
+                    default: return height;
+                }
+            },
+            
+            convertWeightToKg: function(weight, unit) {
+                switch(unit) {
+                    case 'kg': return weight;
+                    case 'g': return weight / 1000;
+                    case 'lbs': return weight * 0.453592;
+                    case 'oz': return weight * 0.0283495;
+                    default: return weight;
+                }
+            },
+            
+            calculateIBW: function() {
+                const height = parseFloat(document.getElementById('clientHeight').value);
+                const heightUnit = document.getElementById('heightUnit').value;
+                const gender = document.getElementById('clientGender').value;
+                
+                if (!height || !gender) {
+                    alert('Please enter height and select gender first');
+                    return;
+                }
+                
+                const heightInCm = this.convertHeightToCm(height, heightUnit);
+                
+                let ibw;
+                if (gender === 'male') {
+                    ibw = 50 + 0.9 * (heightInCm - 152);
+                } else {
+                    ibw = 45.5 + 0.9 * (heightInCm - 152);
+                }
+                
+                document.getElementById('ibwResult').innerHTML = `
+                    <strong>Ideal Body Weight:</strong> ${ibw.toFixed(1)} kg
+                    <br><small>Based on Devine formula for ${gender}</small>
+                `;
+            },
+            
+            calculateBMI: function() {
+                const height = parseFloat(document.getElementById('clientHeight').value);
+                const heightUnit = document.getElementById('heightUnit').value;
+                const weight = parseFloat(document.getElementById('clientWeight').value);
+                const weightUnit = document.getElementById('weightUnit').value;
+                
+                if (!height || !weight) {
+                    alert('Please enter height and weight first');
+                    return;
+                }
+                
+                const heightInM = this.convertHeightToCm(height, heightUnit) / 100;
+                const weightInKg = this.convertWeightToKg(weight, weightUnit);
+                
+                const bmi = weightInKg / (heightInM * heightInM);
+                
+                let category;
+                if (bmi < 18.5) category = 'Underweight';
+                else if (bmi < 25) category = 'Normal weight';
+                else if (bmi < 30) category = 'Overweight';
+                else category = 'Obesity';
+                
+                document.getElementById('bmiResult').innerHTML = `
+                    <strong>BMI:</strong> ${bmi.toFixed(1)} (${category})
+                    <br><small>Weight status: ${category}</small>
+                `;
+            },
+            
+            calculateBEE: function() {
+                const weight = parseFloat(document.getElementById('clientWeight').value);
+                const weightUnit = document.getElementById('weightUnit').value;
+                const height = parseFloat(document.getElementById('clientHeight').value);
+                const heightUnit = document.getElementById('heightUnit').value;
+                const age = parseInt(document.getElementById('clientAge').value);
+                const gender = document.getElementById('clientGender').value;
+                
+                if (!weight || !height || !age || !gender) {
+                    alert('Please complete client information first');
+                    return;
+                }
+                
+                const weightInKg = this.convertWeightToKg(weight, weightUnit);
+                const heightInCm = this.convertHeightToCm(height, heightUnit);
+                
+                let bee;
+                if (gender === 'male') {
+                    bee = 66.5 + (13.75 * weightInKg) + (5.003 * heightInCm) - (6.75 * age);
+                } else {
+                    bee = 655.1 + (9.563 * weightInKg) + (1.850 * heightInCm) - (4.676 * age);
+                }
+                
+                document.getElementById('beeResult').innerHTML = `
+                    <strong>Basal Energy Expenditure (BEE):</strong> ${bee.toFixed(0)} kcal/day
+                    <br><small>Based on Harris-Benedict equation</small>
+                `;
+            },
+            
+            calculateTEE: function() {
+                const weight = parseFloat(document.getElementById('clientWeight').value);
+                const weightUnit = document.getElementById('weightUnit').value;
+                const height = parseFloat(document.getElementById('clientHeight').value);
+                const heightUnit = document.getElementById('heightUnit').value;
+                const age = parseInt(document.getElementById('clientAge').value);
+                const gender = document.getElementById('clientGender').value;
+                const activityLevel = parseFloat(document.getElementById('activityLevel').value);
+                
+                if (!weight || !height || !age || !gender || !activityLevel) {
+                    alert('Please complete client information first');
+                    return;
+                }
+                
+                const weightInKg = this.convertWeightToKg(weight, weightUnit);
+                const heightInCm = this.convertHeightToCm(height, heightUnit);
+                
+                let bee;
+                if (gender === 'male') {
+                    bee = 66.5 + (13.75 * weightInKg) + (5.003 * heightInCm) - (6.75 * age);
+                } else {
+                    bee = 655.1 + (9.563 * weightInKg) + (1.850 * heightInCm) - (4.676 * age);
+                }
+                
+                const tee = bee * activityLevel;
+                
+                document.getElementById('teeResult').innerHTML = `
+                    <strong>Total Energy Expenditure (TEE):</strong> ${tee.toFixed(0)} kcal/day
+                    <br><small>Based on activity level multiplier: ${activityLevel}</small>
+                `;
+            },
+            
+            setupAMDRChart: function() {
+                const ctx = document.getElementById('amdrChart').getContext('2d');
+                this.amdrChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Protein', 'Carbohydrates', 'Fats'],
+                        datasets: [{
+                            data: [25, 50, 25],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'AMDR Distribution'
+                            }
+                        }
+                    }
+                });
+            },
+            
+            calculateAMDR: function() {
+                const teeText = document.getElementById('teeResult').innerText;
+                if (!teeText.includes('kcal/day')) {
+                    alert('Please calculate TEE first');
+                    return;
+                }
+                
+                const tee = parseFloat(teeText.split(' ')[5]);
+                
+                const proteinMin = (tee * 0.10 / 4).toFixed(1);
+                const proteinMax = (tee * 0.35 / 4).toFixed(1);
+                const carbMin = (tee * 0.45 / 4).toFixed(1);
+                const carbMax = (tee * 0.65 / 4).toFixed(1);
+                const fatMin = (tee * 0.20 / 9).toFixed(1);
+                const fatMax = (tee * 0.35 / 9).toFixed(1);
+                
+                document.getElementById('amdrResult').innerHTML = `
+                    <strong>Acceptable Macronutrient Distribution Ranges (AMDR):</strong>
+                    <br>Protein: ${proteinMin} - ${proteinMax} g (10-35% of calories)
+                    <br>Carbohydrates: ${carbMin} - ${carbMax} g (45-65% of calories)
+                    <br>Fats: ${fatMin} - ${fatMax} g (20-35% of calories)
+                `;
+                
+                // Update chart
+                this.amdrChart.data.datasets[0].data = [25, 50, 25];
+                this.amdrChart.update();
+            },
+            
+            analyzeClinicalSigns: function() {
+                const selectedSigns = Array.from(document.getElementById('clinicalSigns').selectedOptions).map(opt => opt.value);
+                
+                if (selectedSigns.length === 0) {
+                    alert('Please select at least one clinical sign');
+                    return;
+                }
+                
+                let analysis = '<strong>Clinical Signs Analysis:</strong><br>';
+                
+                if (selectedSigns.includes('fatigue')) {
+                    analysis += '- Fatigue may indicate iron deficiency anemia or vitamin B12 deficiency.<br>';
+                }
+                
+                if (selectedSigns.includes('weight_loss')) {
+                    analysis += '- Unexplained weight loss may indicate hyperthyroidism, diabetes, or malabsorption.<br>';
+                }
+                
+                if (selectedSigns.includes('weight_gain')) {
+                    analysis += '- Unexplained weight gain may indicate hypothyroidism or fluid retention.<br>';
+                }
+                
+                if (selectedSigns.includes('hair_loss')) {
+                    analysis += '- Hair loss may indicate iron deficiency, zinc deficiency, or thyroid disorders.<br>';
+                }
+                
+                if (selectedSigns.includes('brittle_nails')) {
+                    analysis += '- Brittle nails may indicate iron deficiency or biotin deficiency.<br>';
+                }
+                
+                if (selectedSigns.includes('pale_skin')) {
+                    analysis += '- Pale skin may indicate anemia.<br>';
+                }
+                
+                if (selectedSigns.includes('swelling')) {
+                    analysis += '- Swelling/edema may indicate protein deficiency or kidney problems.<br>';
+                }
+                
+                analysis += '<br><strong>Recommendations:</strong> Consider biochemical tests to confirm deficiencies and consult with a healthcare provider.';
+                
+                document.getElementById('clinicalResult').innerHTML = analysis;
+            },
+            
+            generateMealPlan: function() {
+                const dietType = document.getElementById('dietType').value;
+                const calorieTarget = parseFloat(document.getElementById('calorieTarget').value);
+                
+                if (!calorieTarget) {
+                    alert('Please enter a calorie target');
+                    return;
+                }
+                
+                const mealPlanResult = document.getElementById('mealPlanResult');
+                
+                let dietDescription = '';
+                switch(dietType) {
+                    case 'lowCalorie':
+                        dietDescription = 'Low Calorie Diet (Weight Loss)';
+                        break;
+                    case 'highCalorie':
+                        dietDescription = 'High Calorie Diet (Weight Gain)';
+                        break;
+                    case 'keto':
+                        dietDescription = 'Ketogenic Diet (Low Carb, High Fat)';
+                        break;
+                    case 'vegetarian':
+                        dietDescription = 'Vegetarian Diet (Plant-based)';
+                        break;
+                    default:
+                        dietDescription = 'Balanced Diet';
+                }
+                
+                mealPlanResult.innerHTML = `
+                    <h6>Meal Plan for ${dietDescription} (${calorieTarget} kcal)</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item">Breakfast: Suggested meal (${Math.round(calorieTarget * 0.25)} kcal)</li>
+                        <li class="list-group-item">Morning Snack: Suggested snack (${Math.round(calorieTarget * 0.1)} kcal)</li>
+                        <li class="list-group-item">Lunch: Suggested meal (${Math.round(calorieTarget * 0.3)} kcal)</li>
+                        <li class="list-group-item">Afternoon Snack: Suggested snack (${Math.round(calorieTarget * 0.1)} kcal)</li>
+                        <li class="list-group-item">Dinner: Suggested meal (${Math.round(calorieTarget * 0.25)} kcal)</li>
+                    </ul>
+                    <div class="mt-3">
+                        <strong>Dietary Recommendations:</strong>
+                        <ul>
+                            <li>Focus on whole foods and minimize processed foods</li>
+                            <li>Stay hydrated with water throughout the day</li>
+                            <li>Include a variety of fruits and vegetables</li>
+                            <li>Choose lean protein sources</li>
+                            <li>Select healthy fats like avocados, nuts, and olive oil</li>
+                        </ul>
+                    </div>
+                `;
+            },
+            
+            generateReport: function() {
+                alert('PDF report generation would be implemented here. In a real application, this would create a comprehensive client report.');
+                
+                // This would typically use jsPDF to generate a PDF report
+                // For demonstration, we'll just show an alert
+            },
+            
+            exportData: function() {
+                if (this.clients.length === 0) {
+                    alert('No client data to export');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(this.clients, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = 'nutrihealth_clients.json';
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+            }
+        };
+
+        // Initialize the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            NutriHealthApp.init();
+        });
+    </script>
+</body>
+</html>
